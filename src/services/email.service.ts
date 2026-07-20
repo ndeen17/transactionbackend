@@ -11,7 +11,7 @@ export async function sendOtpEmail({ to, firstName, code }: SendOtpEmailParams) 
   const html = `
     <div style="font-family: -apple-system, Segoe UI, sans-serif; max-width: 420px; margin: 0 auto;">
       <p style="font-size: 15px; color: #0b0b0f;">Hi ${escapeHtml(firstName)},</p>
-      <p style="font-size: 15px; color: #0b0b0f;">Use the code below to verify your email and finish creating your Currency Exchange account.</p>
+      <p style="font-size: 15px; color: #0b0b0f;">Use the code below to verify your email and finish creating your Astera Banking account.</p>
       <div style="margin: 24px 0; text-align: center;">
         <span style="display: inline-block; font-size: 32px; font-weight: 600; letter-spacing: 8px; color: #1a4fd6; padding: 16px 24px; background: #eaf2ff; border-radius: 16px;">${code}</span>
       </div>
@@ -20,12 +20,21 @@ export async function sendOtpEmail({ to, firstName, code }: SendOtpEmailParams) 
   `;
 
   try {
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: env.EMAIL_FROM,
       to,
       subject: "Your verification code",
       html,
     });
+
+    if (error) {
+      console.error("[email] Resend rejected the OTP email:", error);
+      return;
+    }
+
+    if (env.DEBUG_LOG_OTP) {
+      console.log(`[email] OTP email queued, Resend id: ${data?.id}`);
+    }
   } catch (err) {
     console.error("[email] failed to send OTP email:", err);
   }

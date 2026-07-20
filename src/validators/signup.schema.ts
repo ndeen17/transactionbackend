@@ -10,6 +10,14 @@ import {
 
 const nameField = z.string().trim().min(1).max(60);
 
+/** Optional selects submit "" when untouched — treat that the same as absent. */
+function optionalEnum<T extends readonly [string, ...string[]]>(values: T) {
+  return z
+    .union([z.enum(values), z.literal("")])
+    .optional()
+    .transform((v) => (v === "" || v === undefined ? undefined : v));
+}
+
 function isAtLeast18(dob: string) {
   const date = new Date(dob);
   if (Number.isNaN(date.getTime())) return false;
@@ -32,7 +40,7 @@ export const personalSchema = z.object({
     .refine(isAtLeast18, "You must be at least 18 years old"),
   gender: z.enum(GENDERS),
   nationality: z.string().trim().length(2, "Use a 2-letter country code"),
-  maritalStatus: z.enum(MARITAL_STATUSES).optional(),
+  maritalStatus: optionalEnum(MARITAL_STATUSES),
 });
 
 export const contactSchema = z.object({
