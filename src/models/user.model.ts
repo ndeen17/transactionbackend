@@ -58,7 +58,8 @@ export interface UserDocument extends Document {
   kyc: {
     idType: (typeof ID_TYPES)[number];
     idNumber: string;
-    idDocumentPath: string;
+    idDocumentPublicId: string;
+    idDocumentResourceType: string;
     idDocumentOriginalName?: string;
     idDocumentMimeType?: string;
     reviewStatus: (typeof KYC_REVIEW_STATUSES)[number];
@@ -127,7 +128,8 @@ const userSchema = new Schema<UserDocument>(
     kyc: {
       idType: { type: String, enum: ID_TYPES, required: true },
       idNumber: { type: String, required: true, trim: true, uppercase: true, maxlength: 40 },
-      idDocumentPath: { type: String, required: true },
+      idDocumentPublicId: { type: String, required: true },
+      idDocumentResourceType: { type: String, required: true },
       idDocumentOriginalName: { type: String },
       idDocumentMimeType: { type: String },
       reviewStatus: { type: String, enum: KYC_REVIEW_STATUSES, default: "pending" },

@@ -1,14 +1,14 @@
-import { unlink } from "node:fs/promises";
 import bcrypt from "bcrypt";
 import { env } from "../config/env.js";
 import { User } from "../models/user.model.js";
 import type { SignupInput } from "../validators/signup.schema.js";
 import { generateUniqueLoginId, buildBaseLoginId } from "./loginId.service.js";
 import { issueOtp } from "./otp.service.js";
+import { deleteKycDocument, uploadKycDocument } from "./cloudinaryUpload.service.js";
 import { ApiError } from "../utils/ApiError.js";
 
 interface UploadedFile {
-  path: string;
+  buffer: Buffer;
   originalname: string;
   mimetype: string;
 }
@@ -17,6 +17,8 @@ export async function createSignup(input: SignupInput, file: UploadedFile) {
   const passwordHash = await bcrypt.hash(input.auth.password, env.BCRYPT_SALT_ROUNDS);
   const base = buildBaseLoginId(input.personal.firstName, input.personal.lastName);
   const loginId = await generateUniqueLoginId(base);
+
+  const { publicId, resourceType } = await uploadKycDocument(file.buffer);
 
   let user;
   try {
@@ -27,7 +29,8 @@ export async function createSignup(input: SignupInput, file: UploadedFile) {
       kyc: {
         idType: input.kyc.idType,
         idNumber: input.kyc.idNumber,
-        idDocumentPath: file.path,
+        idDocumentPublicId: publicId,
+        idDocumentResourceType: resourceType,
         idDocumentOriginalName: file.originalname,
         idDocumentMimeType: file.mimetype,
       },
@@ -36,7 +39,7 @@ export async function createSignup(input: SignupInput, file: UploadedFile) {
       consents: { ...input.consents, consentedAt: new Date() },
     });
   } catch (err) {
-    await unlink(file.path).catch(() => undefined);
+    await deleteKycDocument(publicId, resourceType);
     if (isDuplicateKeyError(err)) {
       throw new ApiError(409, duplicateKeyMessage(err), duplicateKeyCode(err));
     }
