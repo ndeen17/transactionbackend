@@ -7,6 +7,7 @@ import { suggestLoginId } from "../services/loginId.service.js";
 import { createSignup } from "../services/signup.service.js";
 import { issueOtp, verifyOtp } from "../services/otp.service.js";
 import { signAuthToken } from "../services/token.service.js";
+import { toUserSummary } from "../utils/userSummary.js";
 import {
   loginIdPreviewSchema,
   resendOtpSchema,
@@ -64,17 +65,7 @@ export const verifyOtpHandler = asyncHandler(async (req: Request, res: Response)
 
   res.json({
     success: true,
-    data: {
-      token,
-      user: {
-        id: user._id.toString(),
-        firstName: user.personal.firstName,
-        loginId: user.auth.loginId,
-        accountType: user.accountType,
-        status: user.status,
-        kycReviewStatus: user.kyc.reviewStatus,
-      },
-    },
+    data: { token, user: toUserSummary(user) },
   });
 });
 

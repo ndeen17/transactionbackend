@@ -74,6 +74,13 @@ export interface UserDocument extends Document {
     loginId: string;
     passwordHash: string;
   };
+  account: {
+    accountNumber: string;
+    balance: number;
+    currency: string;
+    totalCredit: number;
+    totalDebit: number;
+  };
   consents: {
     termsAccepted: boolean;
     privacyPolicyAccepted: boolean;
@@ -147,6 +154,14 @@ const userSchema = new Schema<UserDocument>(
       passwordHash: { type: String, required: true, select: false },
     },
 
+    account: {
+      accountNumber: { type: String, required: true, trim: true },
+      balance: { type: Number, required: true, default: 0 },
+      currency: { type: String, required: true, default: "USD", maxlength: 3 },
+      totalCredit: { type: Number, required: true, default: 0 },
+      totalDebit: { type: Number, required: true, default: 0 },
+    },
+
     consents: {
       termsAccepted: { type: Boolean, required: true },
       privacyPolicyAccepted: { type: Boolean, required: true },
@@ -175,6 +190,7 @@ const userSchema = new Schema<UserDocument>(
 userSchema.index({ "contact.email": 1 }, { unique: true });
 userSchema.index({ "contact.phone": 1 }, { unique: true });
 userSchema.index({ "auth.loginId": 1 }, { unique: true });
+userSchema.index({ "account.accountNumber": 1 }, { unique: true });
 userSchema.index({ "kyc.idType": 1, "kyc.idNumber": 1 }, { unique: true });
 
 export const User = model<UserDocument>("User", userSchema);

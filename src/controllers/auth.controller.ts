@@ -6,6 +6,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { loginSchema } from "../validators/auth.schema.js";
 import { signAuthToken } from "../services/token.service.js";
+import { toUserSummary } from "../utils/userSummary.js";
 
 // Precomputed once so a login attempt against a non-existent loginId still pays
 // the same bcrypt cost as a real one — keeps response timing from leaking
@@ -39,17 +40,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 
   res.json({
     success: true,
-    data: {
-      token,
-      user: {
-        id: user._id.toString(),
-        firstName: user.personal.firstName,
-        loginId: user.auth.loginId,
-        accountType: user.accountType,
-        status: user.status,
-        kycReviewStatus: user.kyc.reviewStatus,
-      },
-    },
+    data: { token, user: toUserSummary(user) },
   });
 });
 
@@ -61,14 +52,6 @@ export const getMe = asyncHandler(async (req: AuthedRequest, res: Response) => {
 
   res.json({
     success: true,
-    data: {
-      id: user._id.toString(),
-      firstName: user.personal.firstName,
-      lastName: user.personal.lastName,
-      loginId: user.auth.loginId,
-      accountType: user.accountType,
-      status: user.status,
-      kycReviewStatus: user.kyc.reviewStatus,
-    },
+    data: toUserSummary(user),
   });
 });
