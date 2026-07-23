@@ -1,12 +1,5 @@
 import { z } from "zod";
-import {
-  ACCOUNT_TYPES,
-  EMPLOYMENT_STATUSES,
-  GENDERS,
-  ID_TYPES,
-  INCOME_RANGES,
-  MARITAL_STATUSES,
-} from "../models/user.model.js";
+import { ACCOUNT_TYPES, GENDERS, ID_TYPES, MARITAL_STATUSES } from "../models/user.model.js";
 
 const nameField = z.string().trim().min(1).max(60);
 
@@ -63,13 +56,6 @@ export const kycSchema = z.object({
   idNumber: z.string().trim().min(3).max(40),
 });
 
-export const employmentSchema = z.object({
-  status: z.enum(EMPLOYMENT_STATUSES),
-  occupation: z.string().trim().max(120).optional().or(z.literal("")),
-  industry: z.string().trim().max(120).optional().or(z.literal("")),
-  annualIncomeRange: z.enum(INCOME_RANGES),
-});
-
 const passwordField = z
   .string()
   .min(8, "At least 8 characters")
@@ -101,7 +87,6 @@ export const signupSchema = z
     personal: personalSchema,
     contact: contactSchema,
     kyc: kycSchema,
-    employment: employmentSchema,
     auth: authSchema,
     consents: consentsSchema,
   })

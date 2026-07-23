@@ -36,7 +36,6 @@ export async function createSignup(input: SignupInput, file: UploadedFile) {
         idDocumentOriginalName: file.originalname,
         idDocumentMimeType: file.mimetype,
       },
-      employment: input.employment,
       auth: { loginId, passwordHash },
       account: { accountNumber, balance: 0, currency: "USD", totalCredit: 0, totalDebit: 0 },
       consents: { ...input.consents, consentedAt: new Date() },

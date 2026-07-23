@@ -11,20 +11,6 @@ export const MARITAL_STATUSES = [
 ] as const;
 export const ID_TYPES = ["passport", "drivers_license", "national_id"] as const;
 export const KYC_REVIEW_STATUSES = ["pending", "approved", "rejected"] as const;
-export const EMPLOYMENT_STATUSES = [
-  "employed",
-  "self_employed",
-  "unemployed",
-  "student",
-  "retired",
-] as const;
-export const INCOME_RANGES = [
-  "under_25000",
-  "25000_49999",
-  "50000_99999",
-  "100000_249999",
-  "250000_plus",
-] as const;
 export const USER_STATUSES = [
   "pending_verification",
   "active",
@@ -63,12 +49,6 @@ export interface UserDocument extends Document {
     idDocumentOriginalName?: string;
     idDocumentMimeType?: string;
     reviewStatus: (typeof KYC_REVIEW_STATUSES)[number];
-  };
-  employment: {
-    status: (typeof EMPLOYMENT_STATUSES)[number];
-    occupation?: string;
-    industry?: string;
-    annualIncomeRange: (typeof INCOME_RANGES)[number];
   };
   auth: {
     loginId: string;
@@ -140,13 +120,6 @@ const userSchema = new Schema<UserDocument>(
       idDocumentOriginalName: { type: String },
       idDocumentMimeType: { type: String },
       reviewStatus: { type: String, enum: KYC_REVIEW_STATUSES, default: "pending" },
-    },
-
-    employment: {
-      status: { type: String, enum: EMPLOYMENT_STATUSES, required: true },
-      occupation: { type: String, trim: true, maxlength: 120 },
-      industry: { type: String, trim: true, maxlength: 120 },
-      annualIncomeRange: { type: String, enum: INCOME_RANGES, required: true },
     },
 
     auth: {
