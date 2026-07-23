@@ -15,3 +15,17 @@ export function validateBody(schema: ZodTypeAny) {
     next();
   };
 }
+
+export function validateQuery(schema: ZodTypeAny) {
+  return (req: Request, _res: Response, next: NextFunction) => {
+    const result = schema.safeParse(req.query);
+    if (!result.success) {
+      next(
+        new ApiError(400, "Validation failed", "VALIDATION_ERROR", result.error.flatten()),
+      );
+      return;
+    }
+    req.query = result.data as unknown as Request["query"];
+    next();
+  };
+}

@@ -9,6 +9,7 @@ export function toUserSummary(user: UserDocument) {
     accountType: user.accountType,
     status: user.status,
     kycReviewStatus: user.kyc.reviewStatus,
+    hasPin: Boolean(user.auth.pinSetAt),
     account: {
       accountNumber: user.account.accountNumber,
       balance: user.account.balance,

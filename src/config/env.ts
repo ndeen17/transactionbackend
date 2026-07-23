@@ -23,6 +23,9 @@ const envSchema = z.object({
 
   BCRYPT_SALT_ROUNDS: z.coerce.number().default(12),
 
+  PIN_MAX_ATTEMPTS: z.coerce.number().default(5),
+  PIN_LOCKOUT_MINUTES: z.coerce.number().default(15),
+
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
   JWT_EXPIRES_IN: z.string().default("7d"),
 

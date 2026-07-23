@@ -53,6 +53,10 @@ export interface UserDocument extends Document {
   auth: {
     loginId: string;
     passwordHash: string;
+    pinHash?: string;
+    pinSetAt?: Date | null;
+    pinFailedAttempts: number;
+    pinLockedUntil?: Date | null;
   };
   account: {
     accountNumber: string;
@@ -125,6 +129,10 @@ const userSchema = new Schema<UserDocument>(
     auth: {
       loginId: { type: String, required: true, trim: true, maxlength: 40 },
       passwordHash: { type: String, required: true, select: false },
+      pinHash: { type: String, select: false },
+      pinSetAt: { type: Date, default: null },
+      pinFailedAttempts: { type: Number, required: true, default: 0 },
+      pinLockedUntil: { type: Date, default: null },
     },
 
     account: {
@@ -152,7 +160,10 @@ const userSchema = new Schema<UserDocument>(
     toJSON: {
       transform: (_doc, ret) => {
         const obj = ret as Record<string, any>;
-        if (obj.auth) delete obj.auth.passwordHash;
+        if (obj.auth) {
+          delete obj.auth.passwordHash;
+          delete obj.auth.pinHash;
+        }
         delete obj.__v;
         return obj;
       },
