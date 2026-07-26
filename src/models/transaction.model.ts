@@ -1,6 +1,6 @@
 import { Schema, model, type Document, type Types } from "mongoose";
 
-export const TRANSACTION_TYPES = ["transfer", "deposit"] as const;
+export const TRANSACTION_TYPES = ["transfer", "deposit", "adjustment"] as const;
 export const TRANSACTION_DIRECTIONS = ["debit", "credit"] as const;
 export const TRANSACTION_STATUSES = ["completed", "failed"] as const;
 

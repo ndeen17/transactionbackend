@@ -71,3 +71,13 @@ export const depositLimiter = rateLimit({
   keyGenerator: byUser,
   message: { success: false, message: "Too many deposit attempts. Try again later." },
 });
+
+// Keyed by IP (not byUser) — there's no authenticated identity yet at the login step,
+// and the whole point here is to slow down password-guessing against a single shared secret.
+export const adminLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Too many attempts. Try again later." },
+});

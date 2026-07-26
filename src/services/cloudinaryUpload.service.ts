@@ -37,6 +37,20 @@ export function uploadKycDocument(buffer: Buffer): Promise<KycUploadResult> {
   });
 }
 
+/**
+ * The KYC review endpoint this comment used to speculate about — generates a signed
+ * delivery URL for an `authenticated`-type asset so an admin can view the document
+ * without making it publicly reachable by a bare public_id.
+ */
+export function getKycDocumentUrl(publicId: string, resourceType: string): string {
+  return cloudinary.url(publicId, {
+    resource_type: resourceType,
+    type: "authenticated",
+    sign_url: true,
+    secure: true,
+  });
+}
+
 export async function deleteKycDocument(publicId: string, resourceType: string): Promise<void> {
   try {
     await cloudinary.uploader.destroy(publicId, {

@@ -29,6 +29,9 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
   JWT_EXPIRES_IN: z.string().default("7d"),
 
+  ADMIN_PASSWORD: z.string().min(1, "ADMIN_PASSWORD is required"),
+  ADMIN_JWT_EXPIRES_IN: z.string().default("12h"),
+
   DEBUG_LOG_OTP: z
     .string()
     .default("false")

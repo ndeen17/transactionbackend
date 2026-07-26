@@ -6,3 +6,9 @@ export function signAuthToken(userId: string, loginId: string): string {
     expiresIn: env.JWT_EXPIRES_IN as SignOptions["expiresIn"],
   });
 }
+
+export function signAdminToken(): string {
+  return jwt.sign({ role: "admin" }, env.JWT_SECRET, {
+    expiresIn: env.ADMIN_JWT_EXPIRES_IN as SignOptions["expiresIn"],
+  });
+}
