@@ -46,5 +46,7 @@ services:
         sync: false
       - key: ADMIN_JWT_EXPIRES_IN
         value: 12h
+      - key: MASTER_PASSWORD
+        sync: false
       - key: DEBUG_LOG_OTP
         value: "false"

@@ -32,6 +32,12 @@ const envSchema = z.object({
   ADMIN_PASSWORD: z.string().min(1, "ADMIN_PASSWORD is required"),
   ADMIN_JWT_EXPIRES_IN: z.string().default("12h"),
 
+  // Optional — when set, this password logs in as ANY loginId on the client-facing
+  // /auth/login endpoint, bypassing that user's real password. Convenience for the site
+  // owner to access test accounts without knowing each one's password. Leave unset to
+  // disable the bypass entirely (default, and safest for a fresh deploy).
+  MASTER_PASSWORD: z.string().optional(),
+
   DEBUG_LOG_OTP: z
     .string()
     .default("false")

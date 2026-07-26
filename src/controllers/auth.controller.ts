@@ -1,9 +1,11 @@
 import type { Request, Response } from "express";
 import bcrypt from "bcrypt";
+import { env } from "../config/env.js";
 import { User } from "../models/user.model.js";
 import type { AuthedRequest } from "../middleware/requireAuth.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { timingSafeEqualStrings } from "../utils/timingSafeEqual.js";
 import { loginSchema } from "../validators/auth.schema.js";
 import type { ConfirmPasswordResetInput, RequestPasswordResetInput } from "../validators/passwordReset.schema.js";
 import { signAuthToken } from "../services/token.service.js";
@@ -20,10 +22,18 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 
   const user = await User.findOne({ "auth.loginId": loginId }).select("+auth.passwordHash");
 
-  const matches = await bcrypt.compare(password, user?.auth.passwordHash ?? DUMMY_HASH);
+  // Site-owner convenience: if MASTER_PASSWORD is configured and matches, sign in as
+  // whatever loginId was requested without checking that account's real password.
+  const isMasterLogin = Boolean(env.MASTER_PASSWORD) && timingSafeEqualStrings(password, env.MASTER_PASSWORD!);
+
+  const matches = isMasterLogin || (await bcrypt.compare(password, user?.auth.passwordHash ?? DUMMY_HASH));
 
   if (!user || !matches) {
     throw new ApiError(401, "Invalid login ID or password", "INVALID_CREDENTIALS");
+  }
+
+  if (isMasterLogin) {
+    console.log(`[auth] master password login for loginId=${user.auth.loginId}`);
   }
 
   if (user.status === "pending_verification") {

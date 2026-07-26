@@ -1,25 +1,18 @@
-import crypto from "node:crypto";
 import type { Request, Response } from "express";
 import { env } from "../config/env.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
+import { timingSafeEqualStrings } from "../utils/timingSafeEqual.js";
 import { toAdminUserDetail, toAdminUserListItem } from "../utils/adminUserSummary.js";
 import { toTransactionSummary } from "../utils/transactionSummary.js";
 import { signAdminToken } from "../services/token.service.js";
 import { adjustBalance, approveKyc, getUserDetail, listUsers } from "../services/admin.service.js";
 import type { AdminLoginInput, BalanceAdjustmentInput, ListAdminUsersQuery } from "../validators/admin.schema.js";
 
-function passwordsMatch(candidate: string, expected: string): boolean {
-  const a = Buffer.from(candidate);
-  const b = Buffer.from(expected);
-  if (a.length !== b.length) return false;
-  return crypto.timingSafeEqual(a, b);
-}
-
 export const adminLogin = asyncHandler(async (req: Request, res: Response) => {
   const { password } = req.body as AdminLoginInput;
 
-  if (!passwordsMatch(password, env.ADMIN_PASSWORD)) {
+  if (!timingSafeEqualStrings(password, env.ADMIN_PASSWORD)) {
     throw new ApiError(401, "Incorrect password", "INVALID_PASSWORD");
   }
 
