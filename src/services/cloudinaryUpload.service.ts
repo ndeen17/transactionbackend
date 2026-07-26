@@ -61,3 +61,46 @@ export async function deleteKycDocument(publicId: string, resourceType: string):
     console.error("[cloudinary] failed to clean up orphaned asset:", err);
   }
 }
+
+export interface AvatarUploadResult {
+  url: string;
+  publicId: string;
+}
+
+/**
+ * Profile photos aren't identity-sensitive like KYC documents, so they're uploaded with
+ * Cloudinary's default public delivery type — the returned URL can be stored and used
+ * directly in an <img> tag with no signing step. Cropped to a square, face-centered
+ * where possible, so avatars display consistently regardless of the source photo's shape.
+ */
+export function uploadProfileImage(buffer: Buffer): Promise<AvatarUploadResult> {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: "avatars",
+        resource_type: "image",
+        transformation: [{ width: 400, height: 400, crop: "fill", gravity: "face" }],
+        unique_filename: true,
+        use_filename: false,
+        overwrite: false,
+      },
+      (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
+        if (error || !result) {
+          reject(error ?? new Error("Cloudinary upload failed"));
+          return;
+        }
+        resolve({ url: result.secure_url, publicId: result.public_id });
+      },
+    );
+
+    Readable.from(buffer).pipe(uploadStream);
+  });
+}
+
+export async function deleteProfileImage(publicId: string): Promise<void> {
+  try {
+    await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
+  } catch (err) {
+    console.error("[cloudinary] failed to clean up orphaned avatar:", err);
+  }
+}

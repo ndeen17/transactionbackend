@@ -10,6 +10,7 @@ export function toUserSummary(user: UserDocument) {
     status: user.status,
     kycReviewStatus: user.kyc.reviewStatus,
     hasPin: Boolean(user.auth.pinSetAt),
+    avatarUrl: user.profile?.avatarUrl,
     account: {
       accountNumber: user.account.accountNumber,
       balance: user.account.balance,

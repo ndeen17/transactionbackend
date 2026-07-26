@@ -65,6 +65,10 @@ export interface UserDocument extends Document {
     totalCredit: number;
     totalDebit: number;
   };
+  profile: {
+    avatarUrl?: string;
+    avatarPublicId?: string;
+  };
   consents: {
     termsAccepted: boolean;
     privacyPolicyAccepted: boolean;
@@ -141,6 +145,11 @@ const userSchema = new Schema<UserDocument>(
       currency: { type: String, required: true, default: "USD", maxlength: 3 },
       totalCredit: { type: Number, required: true, default: 0 },
       totalDebit: { type: Number, required: true, default: 0 },
+    },
+
+    profile: {
+      avatarUrl: { type: String },
+      avatarPublicId: { type: String },
     },
 
     consents: {

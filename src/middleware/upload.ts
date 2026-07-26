@@ -29,3 +29,23 @@ export const uploadKycDocument = multer({
   fileFilter,
   limits: { fileSize: env.KYC_MAX_FILE_SIZE_MB * 1024 * 1024 },
 }).single("idDocument");
+
+const AVATAR_ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+const AVATAR_ALLOWED_EXTENSIONS_RE = /\.(jpe?g|png|webp)$/i;
+const AVATAR_MAX_FILE_SIZE_MB = 5;
+
+function avatarFileFilter(_req: Request, file: Express.Multer.File, cb: FileFilterCallback) {
+  const allowed =
+    AVATAR_ALLOWED_MIME_TYPES.has(file.mimetype) || AVATAR_ALLOWED_EXTENSIONS_RE.test(file.originalname);
+  if (!allowed) {
+    cb(new Error("UNSUPPORTED_AVATAR_FILE_TYPE"));
+    return;
+  }
+  cb(null, true);
+}
+
+export const uploadAvatarPhoto = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: avatarFileFilter,
+  limits: { fileSize: AVATAR_MAX_FILE_SIZE_MB * 1024 * 1024 },
+}).single("avatar");

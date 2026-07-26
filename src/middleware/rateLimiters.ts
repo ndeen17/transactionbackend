@@ -97,3 +97,12 @@ export const passwordResetConfirmLimiter = rateLimit({
   legacyHeaders: false,
   message: { success: false, message: "Too many attempts. Try again later." },
 });
+
+export const avatarUploadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: byUser,
+  message: { success: false, message: "Too many photo uploads. Try again later." },
+});

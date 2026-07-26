@@ -41,6 +41,15 @@ export function errorHandler(
     return;
   }
 
+  if (err instanceof Error && err.message === "UNSUPPORTED_AVATAR_FILE_TYPE") {
+    res.status(415).json({
+      success: false,
+      message: "Unsupported file type. Upload a JPG, PNG, or WEBP image.",
+      code: "UNSUPPORTED_FILE_TYPE",
+    });
+    return;
+  }
+
   if (err && typeof err === "object" && "code" in err && (err as { code: unknown }).code === 11000) {
     res.status(409).json({
       success: false,
