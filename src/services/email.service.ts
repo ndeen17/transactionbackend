@@ -40,6 +40,45 @@ export async function sendOtpEmail({ to, firstName, code }: SendOtpEmailParams) 
   }
 }
 
+interface SendPasswordResetEmailParams {
+  to: string;
+  firstName: string;
+  code: string;
+}
+
+export async function sendPasswordResetEmail({ to, firstName, code }: SendPasswordResetEmailParams) {
+  const html = `
+    <div style="font-family: -apple-system, Segoe UI, sans-serif; max-width: 420px; margin: 0 auto;">
+      <p style="font-size: 15px; color: #0b0b0f;">Hi ${escapeHtml(firstName)},</p>
+      <p style="font-size: 15px; color: #0b0b0f;">Use the code below to reset your Astera Banking password.</p>
+      <div style="margin: 24px 0; text-align: center;">
+        <span style="display: inline-block; font-size: 32px; font-weight: 600; letter-spacing: 8px; color: #1a4fd6; padding: 16px 24px; background: #eaf2ff; border-radius: 16px;">${code}</span>
+      </div>
+      <p style="font-size: 13px; color: #7c8592;">This code expires in ${env.OTP_EXPIRY_MINUTES} minutes. If you didn't request a password reset, you can safely ignore this email — your password will not be changed.</p>
+    </div>
+  `;
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: env.EMAIL_FROM,
+      to,
+      subject: "Reset your password",
+      html,
+    });
+
+    if (error) {
+      console.error("[email] Resend rejected the password reset email:", error);
+      return;
+    }
+
+    if (env.DEBUG_LOG_OTP) {
+      console.log(`[email] password reset email queued, Resend id: ${data?.id}`);
+    }
+  } catch (err) {
+    console.error("[email] failed to send password reset email:", err);
+  }
+}
+
 interface SendKycApprovedEmailParams {
   to: string;
   firstName: string;

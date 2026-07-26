@@ -81,3 +81,19 @@ export const adminLoginLimiter = rateLimit({
   legacyHeaders: false,
   message: { success: false, message: "Too many attempts. Try again later." },
 });
+
+export const passwordResetRequestLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Too many attempts. Try again later." },
+});
+
+export const passwordResetConfirmLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Too many attempts. Try again later." },
+});

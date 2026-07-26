@@ -5,7 +5,9 @@ import type { AuthedRequest } from "../middleware/requireAuth.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { loginSchema } from "../validators/auth.schema.js";
+import type { ConfirmPasswordResetInput, RequestPasswordResetInput } from "../validators/passwordReset.schema.js";
 import { signAuthToken } from "../services/token.service.js";
+import { confirmPasswordReset, requestPasswordReset } from "../services/passwordReset.service.js";
 import { toUserSummary } from "../utils/userSummary.js";
 
 // Precomputed once so a login attempt against a non-existent loginId still pays
@@ -37,6 +39,26 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const token = signAuthToken(user._id.toString(), user.auth.loginId);
+
+  res.json({
+    success: true,
+    data: { token, user: toUserSummary(user) },
+  });
+});
+
+export const requestPasswordResetHandler = asyncHandler(async (req: Request, res: Response) => {
+  const { loginId } = req.body as RequestPasswordResetInput;
+  await requestPasswordReset(loginId);
+
+  res.json({
+    success: true,
+    data: { message: "If an account exists for that login ID, we've sent a reset code to the email on file." },
+  });
+});
+
+export const confirmPasswordResetHandler = asyncHandler(async (req: Request, res: Response) => {
+  const { loginId, code, newPassword } = req.body as ConfirmPasswordResetInput;
+  const { token, user } = await confirmPasswordReset({ loginId, code, newPassword });
 
   res.json({
     success: true,
