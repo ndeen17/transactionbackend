@@ -106,3 +106,12 @@ export const avatarUploadLimiter = rateLimit({
   keyGenerator: byUser,
   message: { success: false, message: "Too many photo uploads. Try again later." },
 });
+
+export const cryptoDepositLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: byUser,
+  message: { success: false, message: "Too many deposit requests. Try again later." },
+});
