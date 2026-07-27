@@ -6,7 +6,14 @@ import { timingSafeEqualStrings } from "../utils/timingSafeEqual.js";
 import { toAdminUserDetail, toAdminUserListItem } from "../utils/adminUserSummary.js";
 import { toTransactionSummary } from "../utils/transactionSummary.js";
 import { signAdminToken } from "../services/token.service.js";
-import { adjustBalance, approveKyc, getUserDetail, listUsers } from "../services/admin.service.js";
+import {
+  adjustBalance,
+  approveKyc,
+  getUserDetail,
+  listUsers,
+  suspendUser,
+  unsuspendUser,
+} from "../services/admin.service.js";
 import type { AdminLoginInput, BalanceAdjustmentInput, ListAdminUsersQuery } from "../validators/admin.schema.js";
 
 export const adminLogin = asyncHandler(async (req: Request, res: Response) => {
@@ -43,6 +50,16 @@ export const getUser = asyncHandler(async (req: Request, res: Response) => {
 export const approveUserKyc = asyncHandler(async (req: Request, res: Response) => {
   const user = await approveKyc(req.params.id!);
   res.json({ success: true, data: { kycReviewStatus: user.kyc.reviewStatus } });
+});
+
+export const suspendUserHandler = asyncHandler(async (req: Request, res: Response) => {
+  const user = await suspendUser(req.params.id!);
+  res.json({ success: true, data: { status: user.status } });
+});
+
+export const unsuspendUserHandler = asyncHandler(async (req: Request, res: Response) => {
+  const user = await unsuspendUser(req.params.id!);
+  res.json({ success: true, data: { status: user.status } });
 });
 
 export const submitBalanceAdjustment = asyncHandler(async (req: Request, res: Response) => {

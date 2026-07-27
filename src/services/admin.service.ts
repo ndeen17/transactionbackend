@@ -3,7 +3,7 @@ import { User, type UserDocument } from "../models/user.model.js";
 import { Transaction } from "../models/transaction.model.js";
 import { generateUniqueReference } from "./transactionReference.service.js";
 import { getKycDocumentUrl } from "./cloudinaryUpload.service.js";
-import { sendKycApprovedEmail } from "./email.service.js";
+import { sendAccountReinstatedEmail, sendAccountSuspendedEmail, sendKycApprovedEmail } from "./email.service.js";
 import { ApiError } from "../utils/ApiError.js";
 import type { ListAdminUsersQuery } from "../validators/admin.schema.js";
 
@@ -76,6 +76,50 @@ export async function approveKyc(userId: string) {
   await user.save();
 
   await sendKycApprovedEmail({ to: user.contact.email, firstName: user.personal.firstName });
+
+  return user;
+}
+
+export async function suspendUser(userId: string) {
+  if (!Types.ObjectId.isValid(userId)) {
+    throw new ApiError(404, "User not found", "NOT_FOUND");
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found", "NOT_FOUND");
+  }
+
+  if (user.status === "suspended") {
+    throw new ApiError(409, "This account is already suspended.", "ALREADY_SUSPENDED");
+  }
+
+  user.status = "suspended";
+  await user.save();
+
+  await sendAccountSuspendedEmail({ to: user.contact.email, firstName: user.personal.firstName });
+
+  return user;
+}
+
+export async function unsuspendUser(userId: string) {
+  if (!Types.ObjectId.isValid(userId)) {
+    throw new ApiError(404, "User not found", "NOT_FOUND");
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found", "NOT_FOUND");
+  }
+
+  if (user.status !== "suspended") {
+    throw new ApiError(409, "This account is not suspended.", "NOT_SUSPENDED");
+  }
+
+  user.status = "active";
+  await user.save();
+
+  await sendAccountReinstatedEmail({ to: user.contact.email, firstName: user.personal.firstName });
 
   return user;
 }

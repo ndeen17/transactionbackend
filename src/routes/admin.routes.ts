@@ -5,6 +5,8 @@ import {
   getUser,
   getUsers,
   submitBalanceAdjustment,
+  suspendUserHandler,
+  unsuspendUserHandler,
 } from "../controllers/admin.controller.js";
 import { requireAdmin } from "../middleware/requireAdmin.js";
 import { validateBody, validateQuery } from "../middleware/validate.js";
@@ -17,6 +19,8 @@ adminRouter.post("/login", adminLoginLimiter, validateBody(adminLoginSchema), ad
 adminRouter.get("/users", requireAdmin, validateQuery(listAdminUsersQuerySchema), getUsers);
 adminRouter.get("/users/:id", requireAdmin, getUser);
 adminRouter.post("/users/:id/kyc/approve", requireAdmin, approveUserKyc);
+adminRouter.post("/users/:id/suspend", requireAdmin, suspendUserHandler);
+adminRouter.post("/users/:id/unsuspend", requireAdmin, unsuspendUserHandler);
 adminRouter.post(
   "/users/:id/balance-adjustment",
   requireAdmin,

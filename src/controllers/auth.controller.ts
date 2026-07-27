@@ -44,7 +44,15 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     );
   }
 
-  if (user.status === "suspended" || user.status === "closed") {
+  if (user.status === "suspended") {
+    throw new ApiError(
+      403,
+      "This account has been suspended and is under review.",
+      "ACCOUNT_SUSPENDED",
+    );
+  }
+
+  if (user.status === "closed") {
     throw new ApiError(403, "This account is no longer active. Contact support.", "ACCOUNT_INACTIVE");
   }
 
