@@ -1,5 +1,6 @@
 import { randomInt } from "node:crypto";
 import { Transaction } from "../models/transaction.model.js";
+import { CryptoDepositRequest } from "../models/cryptoDepositRequest.model.js";
 
 // No 0/O or 1/I — avoids ambiguous characters on a printed/screenshotted receipt.
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -24,11 +25,21 @@ function buildCandidate(randomLength = 6): string {
   return `AST${todayStamp()}${randomChars(randomLength)}`;
 }
 
+// Checked against both collections — a CryptoDepositRequest's reference is generated once
+// at claim submission and reused verbatim on the Transaction created when it's credited, so
+// the two collections share one reference namespace.
+async function isReferenceTaken(candidate: string): Promise<boolean> {
+  const [txTaken, cryptoTaken] = await Promise.all([
+    Transaction.exists({ reference: candidate }),
+    CryptoDepositRequest.exists({ reference: candidate }),
+  ]);
+  return Boolean(txTaken || cryptoTaken);
+}
+
 export async function generateUniqueReference(): Promise<string> {
   for (let attempt = 0; attempt < 10; attempt++) {
     const candidate = buildCandidate(6);
-    const taken = await Transaction.exists({ reference: candidate });
-    if (!taken) return candidate;
+    if (!(await isReferenceTaken(candidate))) return candidate;
   }
 
   return buildCandidate(10);
