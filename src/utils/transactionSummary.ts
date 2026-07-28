@@ -15,6 +15,8 @@ export function toTransactionSummary(transaction: TransactionDocument) {
     recipient: transaction.recipient,
     crypto: transaction.crypto,
     bankDeposit: transaction.bankDeposit,
+    cryptoWithdrawal: transaction.cryptoWithdrawal,
+    bankWithdrawal: transaction.bankWithdrawal,
     failureReason: transaction.failureReason,
     createdAt: transaction.createdAt,
   };
