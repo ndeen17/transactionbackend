@@ -1,9 +1,5 @@
 import { ApiError } from "../utils/ApiError.js";
 
-const CATALOG_SIZE = 50;
-const CATALOG_CACHE_TTL_MS = 120_000;
-const CATALOG_URL = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${CATALOG_SIZE}&page=1&sparkline=false`;
-
 export interface CatalogCoin {
   coingeckoId: string;
   symbol: string;
@@ -11,53 +7,43 @@ export interface CatalogCoin {
   priceUsd: number;
 }
 
-interface CoinGeckoMarketEntry {
-  id: string;
-  symbol: string;
-  name: string;
-  current_price: number;
-}
-
-let cache: { data: CatalogCoin[]; fetchedAt: number } | null = null;
-
-async function fetchCatalog(): Promise<CatalogCoin[]> {
-  const res = await fetch(CATALOG_URL);
-  if (!res.ok) {
-    throw new Error(`CoinGecko markets request failed: ${res.status}`);
-  }
-  const raw = (await res.json()) as CoinGeckoMarketEntry[];
-  return raw.map((entry) => ({
-    coingeckoId: entry.id,
-    symbol: entry.symbol.toUpperCase(),
-    name: entry.name,
-    priceUsd: entry.current_price,
-  }));
-}
+// Static list of major coins with fixed, approximate USD rates — deliberately not a live
+// price feed. An earlier version of this called CoinGecko's public API on every deposit
+// submission, which occasionally rate-limits or blocks cloud-hosting IPs (Render included),
+// surfacing as a 503 on the deposit endpoint for end users. Everything else in this app is
+// already simulated (no real blockchain integration), so a static table is consistent with
+// that and removes a third-party dependency from a money-computation code path.
+const CATALOG: CatalogCoin[] = [
+  { coingeckoId: "bitcoin", symbol: "BTC", name: "Bitcoin", priceUsd: 63000 },
+  { coingeckoId: "ethereum", symbol: "ETH", name: "Ethereum", priceUsd: 1900 },
+  { coingeckoId: "tether", symbol: "USDT", name: "Tether", priceUsd: 1 },
+  { coingeckoId: "binancecoin", symbol: "BNB", name: "BNB", priceUsd: 590 },
+  { coingeckoId: "usd-coin", symbol: "USDC", name: "USDC", priceUsd: 1 },
+  { coingeckoId: "ripple", symbol: "XRP", name: "XRP", priceUsd: 0.6 },
+  { coingeckoId: "solana", symbol: "SOL", name: "Solana", priceUsd: 140 },
+  { coingeckoId: "tron", symbol: "TRX", name: "TRON", priceUsd: 0.12 },
+  { coingeckoId: "dogecoin", symbol: "DOGE", name: "Dogecoin", priceUsd: 0.15 },
+  { coingeckoId: "cardano", symbol: "ADA", name: "Cardano", priceUsd: 0.45 },
+  { coingeckoId: "chainlink", symbol: "LINK", name: "Chainlink", priceUsd: 14 },
+  { coingeckoId: "stellar", symbol: "XLM", name: "Stellar", priceUsd: 0.11 },
+  { coingeckoId: "litecoin", symbol: "LTC", name: "Litecoin", priceUsd: 70 },
+  { coingeckoId: "monero", symbol: "XMR", name: "Monero", priceUsd: 160 },
+  { coingeckoId: "bitcoin-cash", symbol: "BCH", name: "Bitcoin Cash", priceUsd: 450 },
+  { coingeckoId: "dai", symbol: "DAI", name: "Dai", priceUsd: 1 },
+  { coingeckoId: "polkadot", symbol: "DOT", name: "Polkadot", priceUsd: 6.5 },
+  { coingeckoId: "avalanche-2", symbol: "AVAX", name: "Avalanche", priceUsd: 35 },
+  { coingeckoId: "shiba-inu", symbol: "SHIB", name: "Shiba Inu", priceUsd: 0.000018 },
+  { coingeckoId: "matic-network", symbol: "MATIC", name: "Polygon", priceUsd: 0.7 },
+];
 
 export async function getCatalog(): Promise<CatalogCoin[]> {
-  const isStale = !cache || Date.now() - cache.fetchedAt > CATALOG_CACHE_TTL_MS;
-  if (!isStale) {
-    return cache!.data;
-  }
-
-  try {
-    const data = await fetchCatalog();
-    cache = { data, fetchedAt: Date.now() };
-    return data;
-  } catch (err) {
-    if (cache) {
-      console.warn("[crypto-catalog] refresh failed, serving stale cache:", err);
-      return cache.data;
-    }
-    throw new ApiError(503, "Live market data is temporarily unavailable", "MARKET_DATA_UNAVAILABLE");
-  }
+  return CATALOG;
 }
 
 export async function getPriceUsd(coingeckoId: string): Promise<number> {
-  const catalog = await getCatalog();
-  const coin = catalog.find((c) => c.coingeckoId === coingeckoId);
+  const coin = CATALOG.find((c) => c.coingeckoId === coingeckoId);
   if (!coin) {
-    throw new ApiError(502, "Couldn't get a live price for this asset", "PRICE_UNAVAILABLE");
+    throw new ApiError(400, "Choose a valid crypto asset", "INVALID_ASSET");
   }
   return coin.priceUsd;
 }
