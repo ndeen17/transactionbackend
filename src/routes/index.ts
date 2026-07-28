@@ -7,6 +7,7 @@ import { adminRouter } from "./admin.routes.js";
 import { accountRouter } from "./account.routes.js";
 import { cryptoRouter } from "./crypto.routes.js";
 import { bankDepositRouter } from "./bankDeposit.routes.js";
+import { withdrawalRouter } from "./withdrawal.routes.js";
 import { notificationRouter } from "./notification.routes.js";
 
 export const apiRouter = Router();
@@ -19,4 +20,5 @@ apiRouter.use("/admin", adminRouter);
 apiRouter.use("/account", accountRouter);
 apiRouter.use("/crypto", cryptoRouter);
 apiRouter.use("/", bankDepositRouter);
+apiRouter.use("/", withdrawalRouter);
 apiRouter.use("/notifications", notificationRouter);

@@ -1,6 +1,14 @@
 import { Schema, model, type Document, type Types } from "mongoose";
 
-export const TRANSACTION_TYPES = ["transfer", "deposit", "adjustment", "crypto_deposit", "bank_deposit"] as const;
+export const TRANSACTION_TYPES = [
+  "transfer",
+  "deposit",
+  "adjustment",
+  "crypto_deposit",
+  "bank_deposit",
+  "crypto_withdrawal",
+  "bank_withdrawal",
+] as const;
 export const TRANSACTION_DIRECTIONS = ["debit", "credit"] as const;
 export const TRANSACTION_STATUSES = ["completed", "failed"] as const;
 
@@ -29,6 +37,18 @@ export interface TransactionDocument extends Document {
     txHash?: string;
   };
   bankDeposit?: {
+    bankName: string;
+    accountName: string;
+    accountNumber: string;
+    routingNumber?: string;
+  };
+  cryptoWithdrawal?: {
+    symbol: string;
+    network?: string;
+    amountCrypto: number;
+    walletAddress: string;
+  };
+  bankWithdrawal?: {
     bankName: string;
     accountName: string;
     accountNumber: string;
@@ -69,6 +89,26 @@ const bankDepositSchema = new Schema(
   { _id: false },
 );
 
+const cryptoWithdrawalSchema = new Schema(
+  {
+    symbol: { type: String, required: true, trim: true },
+    network: { type: String, trim: true },
+    amountCrypto: { type: Number, required: true, min: 0 },
+    walletAddress: { type: String, required: true, trim: true },
+  },
+  { _id: false },
+);
+
+const bankWithdrawalSchema = new Schema(
+  {
+    bankName: { type: String, required: true, trim: true },
+    accountName: { type: String, required: true, trim: true },
+    accountNumber: { type: String, required: true, trim: true },
+    routingNumber: { type: String, trim: true },
+  },
+  { _id: false },
+);
+
 const transactionSchema = new Schema<TransactionDocument>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
@@ -84,6 +124,8 @@ const transactionSchema = new Schema<TransactionDocument>(
     recipient: { type: recipientSchema },
     crypto: { type: cryptoSchema },
     bankDeposit: { type: bankDepositSchema },
+    cryptoWithdrawal: { type: cryptoWithdrawalSchema },
+    bankWithdrawal: { type: bankWithdrawalSchema },
     failureReason: { type: String },
   },
   { timestamps: true },

@@ -33,6 +33,18 @@ import {
   adminGetBankDeposits,
   adminRejectBankDeposit,
 } from "../controllers/adminBankDeposit.controller.js";
+import {
+  adminAcceptCryptoWithdrawal,
+  adminDeclineCryptoWithdrawal,
+  adminGetCryptoWithdrawalDetail,
+  adminGetCryptoWithdrawals,
+} from "../controllers/adminCryptoWithdrawal.controller.js";
+import {
+  adminAcceptBankWithdrawal,
+  adminDeclineBankWithdrawal,
+  adminGetBankWithdrawalDetail,
+  adminGetBankWithdrawals,
+} from "../controllers/adminBankWithdrawal.controller.js";
 import { requireAdmin } from "../middleware/requireAdmin.js";
 import { validateBody, validateQuery } from "../middleware/validate.js";
 import { adminLoginLimiter } from "../middleware/rateLimiters.js";
@@ -44,6 +56,7 @@ import {
 } from "../validators/cryptoDeposit.schema.js";
 import { createBankAccountSchema, updateBankAccountSchema } from "../validators/bankAccount.schema.js";
 import { listBankDepositsQuerySchema, rejectBankDepositSchema } from "../validators/bankDeposit.schema.js";
+import { declineWithdrawalSchema, listWithdrawalsQuerySchema } from "../validators/withdrawal.schema.js";
 
 export const adminRouter = Router();
 
@@ -109,4 +122,34 @@ adminRouter.post(
   requireAdmin,
   validateBody(rejectBankDepositSchema),
   adminRejectBankDeposit,
+);
+
+adminRouter.get(
+  "/crypto-withdrawals",
+  requireAdmin,
+  validateQuery(listWithdrawalsQuerySchema),
+  adminGetCryptoWithdrawals,
+);
+adminRouter.get("/crypto-withdrawals/:id", requireAdmin, adminGetCryptoWithdrawalDetail);
+adminRouter.post("/crypto-withdrawals/:id/accept", requireAdmin, adminAcceptCryptoWithdrawal);
+adminRouter.post(
+  "/crypto-withdrawals/:id/decline",
+  requireAdmin,
+  validateBody(declineWithdrawalSchema),
+  adminDeclineCryptoWithdrawal,
+);
+
+adminRouter.get(
+  "/bank-withdrawals",
+  requireAdmin,
+  validateQuery(listWithdrawalsQuerySchema),
+  adminGetBankWithdrawals,
+);
+adminRouter.get("/bank-withdrawals/:id", requireAdmin, adminGetBankWithdrawalDetail);
+adminRouter.post("/bank-withdrawals/:id/accept", requireAdmin, adminAcceptBankWithdrawal);
+adminRouter.post(
+  "/bank-withdrawals/:id/decline",
+  requireAdmin,
+  validateBody(declineWithdrawalSchema),
+  adminDeclineBankWithdrawal,
 );
