@@ -39,6 +39,7 @@ export function toAdminUserDetail(user: UserDocument, kycDocumentUrl: string) {
     },
     account: {
       accountNumber: user.account.accountNumber,
+      routingNumber: user.account.routingNumber,
       balance: user.account.balance,
       currency: user.account.currency,
       totalCredit: user.account.totalCredit,

@@ -3,7 +3,7 @@ import { env } from "../config/env.js";
 import { User } from "../models/user.model.js";
 import type { SignupInput } from "../validators/signup.schema.js";
 import { generateUniqueLoginId, buildBaseLoginId } from "./loginId.service.js";
-import { generateUniqueAccountNumber } from "./accountNumber.service.js";
+import { generateUniqueAccountNumber, generateUniqueRoutingNumber } from "./accountNumber.service.js";
 import { issueOtp } from "./otp.service.js";
 import { deleteKycDocument, uploadKycDocument } from "./cloudinaryUpload.service.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -19,6 +19,7 @@ export async function createSignup(input: SignupInput, file: UploadedFile) {
   const base = buildBaseLoginId(input.personal.firstName, input.personal.lastName);
   const loginId = await generateUniqueLoginId(base);
   const accountNumber = await generateUniqueAccountNumber();
+  const routingNumber = await generateUniqueRoutingNumber();
 
   const { publicId, resourceType } = await uploadKycDocument(file.buffer);
 
@@ -37,7 +38,7 @@ export async function createSignup(input: SignupInput, file: UploadedFile) {
         idDocumentMimeType: file.mimetype,
       },
       auth: { loginId, passwordHash },
-      account: { accountNumber, balance: 0, currency: "USD", totalCredit: 0, totalDebit: 0 },
+      account: { accountNumber, routingNumber, balance: 0, currency: "USD", totalCredit: 0, totalDebit: 0 },
       consents: { ...input.consents, consentedAt: new Date() },
     });
   } catch (err) {
@@ -75,6 +76,7 @@ function duplicateKeyMessage(err: { keyPattern?: Record<string, unknown> }): str
   if (key.includes("phone")) return "This phone number is already registered.";
   if (key.includes("loginId")) return "That login ID is taken. Please try again.";
   if (key.includes("accountNumber")) return "Could not assign an account number. Please try again.";
+  if (key.includes("routingNumber")) return "Could not assign a routing number. Please try again.";
   if (key.includes("idNumber")) return "This identification document is already registered.";
   return "A record with these details already exists.";
 }
@@ -85,6 +87,7 @@ function duplicateKeyCode(err: { keyPattern?: Record<string, unknown> }): string
   if (key.includes("phone")) return "PHONE_ALREADY_REGISTERED";
   if (key.includes("loginId")) return "LOGIN_ID_TAKEN";
   if (key.includes("accountNumber")) return "ACCOUNT_NUMBER_TAKEN";
+  if (key.includes("routingNumber")) return "ROUTING_NUMBER_TAKEN";
   if (key.includes("idNumber")) return "ID_DOCUMENT_ALREADY_REGISTERED";
   return "DUPLICATE_KEY";
 }

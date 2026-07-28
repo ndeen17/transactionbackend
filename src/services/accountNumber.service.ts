@@ -20,3 +20,13 @@ export async function generateUniqueAccountNumber(): Promise<string> {
   // consistent with how login ID generation handles the same theoretical collision case.
   return randomDigits(14);
 }
+
+export async function generateUniqueRoutingNumber(): Promise<string> {
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const candidate = randomDigits(9);
+    const taken = await User.exists({ "account.routingNumber": candidate });
+    if (!taken) return candidate;
+  }
+
+  return randomDigits(13);
+}

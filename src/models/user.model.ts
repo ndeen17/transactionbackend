@@ -60,6 +60,7 @@ export interface UserDocument extends Document {
   };
   account: {
     accountNumber: string;
+    routingNumber: string;
     balance: number;
     currency: string;
     totalCredit: number;
@@ -141,6 +142,7 @@ const userSchema = new Schema<UserDocument>(
 
     account: {
       accountNumber: { type: String, required: true, trim: true },
+      routingNumber: { type: String, required: true, trim: true },
       balance: { type: Number, required: true, default: 0 },
       currency: { type: String, required: true, default: "USD", maxlength: 3 },
       totalCredit: { type: Number, required: true, default: 0 },
@@ -184,6 +186,7 @@ userSchema.index({ "contact.email": 1 }, { unique: true });
 userSchema.index({ "contact.phone": 1 }, { unique: true });
 userSchema.index({ "auth.loginId": 1 }, { unique: true });
 userSchema.index({ "account.accountNumber": 1 }, { unique: true });
+userSchema.index({ "account.routingNumber": 1 }, { unique: true });
 userSchema.index({ "kyc.idType": 1, "kyc.idNumber": 1 }, { unique: true });
 
 export const User = model<UserDocument>("User", userSchema);
