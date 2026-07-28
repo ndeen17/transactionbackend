@@ -3,6 +3,7 @@ import { User, type UserDocument } from "../models/user.model.js";
 import { Transaction } from "../models/transaction.model.js";
 import { generateUniqueReference } from "./transactionReference.service.js";
 import { getKycDocumentUrl } from "./cloudinaryUpload.service.js";
+import { createNotification } from "./notification.service.js";
 import { sendAccountReinstatedEmail, sendAccountSuspendedEmail, sendKycApprovedEmail } from "./email.service.js";
 import { ApiError } from "../utils/ApiError.js";
 import type { ListAdminUsersQuery } from "../validators/admin.schema.js";
@@ -170,6 +171,17 @@ export async function adjustBalance({ userId, direction, amountMinor, note }: Ad
     currency: updatedUser.account.currency,
     narration: note || "Balance adjustment by admin",
     balanceAfterMinor: Math.round(updatedUser.account.balance * 100),
+  });
+
+  await createNotification({
+    userId: updatedUser._id,
+    type: "balance_adjustment",
+    title: direction === "credit" ? "Balance credited" : "Balance debited",
+    body:
+      direction === "credit"
+        ? `Your balance was credited ${amount.toFixed(2)} ${updatedUser.account.currency}.${note ? ` ${note}` : ""}`
+        : `Your balance was debited ${amount.toFixed(2)} ${updatedUser.account.currency}.${note ? ` ${note}` : ""}`,
+    link: `/dashboard/transactions/${transaction._id.toString()}`,
   });
 
   return { user: updatedUser, transaction };

@@ -1,0 +1,8 @@
+{
+  "accountType": "savings",
+  "personal": {"firstName": "Activity", "lastName": "Check", "dateOfBirth": "1990-03-03", "gender": "other", "nationality": "US"},
+  "contact": {"email": "activitycheck.user+claude@example.com", "phone": "+15555550001", "address": {"line1": "12 Activity Way", "city": "Testville", "state": "TS", "postalCode": "00011", "country": "US"}},
+  "kyc": {"idType": "passport", "idNumber": "AC7788999"},
+  "auth": {"loginId": "activitycheckuser01", "password": "TestPass123", "confirmPassword": "TestPass123"},
+  "consents": {"termsAccepted": true, "privacyPolicyAccepted": true, "electronicCommsConsent": true, "dataProcessingConsent": true, "amlDeclaration": true}
+}

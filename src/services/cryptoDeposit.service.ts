@@ -61,6 +61,14 @@ export async function submitCryptoDeposit({
     status: "pending",
   });
 
+  await createNotification({
+    userId: request.userId,
+    type: "crypto_deposit_initiated",
+    title: "Deposit claim received",
+    body: `We've received your ${request.symbol} deposit claim. It's under review.`,
+    link: `/dashboard/crypto-deposits/${request._id.toString()}`,
+  });
+
   return request;
 }
 

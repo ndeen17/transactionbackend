@@ -1,12 +1,14 @@
 import { Schema, model, type Document, type Types } from "mongoose";
 
 export const NOTIFICATION_TYPES = [
+  "crypto_deposit_initiated",
   "crypto_deposit_accepted",
   "crypto_deposit_rejected",
   "crypto_deposit_credited",
   "bank_deposit_initiated",
   "bank_deposit_approved",
   "bank_deposit_rejected",
+  "balance_adjustment",
 ] as const;
 
 export interface NotificationDocument extends Document {
