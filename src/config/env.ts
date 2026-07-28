@@ -10,7 +10,7 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().default("http://localhost:5173"),
 
   RESEND_API_KEY: z.string().min(1, "RESEND_API_KEY is required"),
-  EMAIL_FROM: z.string().default("Astera Banking <onboarding@resend.dev>"),
+  EMAIL_FROM: z.string().default("Vaulto Hub <onboarding@resend.dev>"),
 
   OTP_EXPIRY_MINUTES: z.coerce.number().default(10),
   OTP_RESEND_COOLDOWN_SECONDS: z.coerce.number().default(60),

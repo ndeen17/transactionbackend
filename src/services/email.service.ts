@@ -11,7 +11,7 @@ export async function sendOtpEmail({ to, firstName, code }: SendOtpEmailParams) 
   const html = `
     <div style="font-family: -apple-system, Segoe UI, sans-serif; max-width: 420px; margin: 0 auto;">
       <p style="font-size: 15px; color: #0b0b0f;">Hi ${escapeHtml(firstName)},</p>
-      <p style="font-size: 15px; color: #0b0b0f;">Use the code below to verify your email and finish creating your Astera Banking account.</p>
+      <p style="font-size: 15px; color: #0b0b0f;">Use the code below to verify your email and finish creating your Vaulto Hub account.</p>
       <div style="margin: 24px 0; text-align: center;">
         <span style="display: inline-block; font-size: 32px; font-weight: 600; letter-spacing: 8px; color: #1a4fd6; padding: 16px 24px; background: #eaf2ff; border-radius: 16px;">${code}</span>
       </div>
@@ -50,7 +50,7 @@ export async function sendPasswordResetEmail({ to, firstName, code }: SendPasswo
   const html = `
     <div style="font-family: -apple-system, Segoe UI, sans-serif; max-width: 420px; margin: 0 auto;">
       <p style="font-size: 15px; color: #0b0b0f;">Hi ${escapeHtml(firstName)},</p>
-      <p style="font-size: 15px; color: #0b0b0f;">Use the code below to reset your Astera Banking password.</p>
+      <p style="font-size: 15px; color: #0b0b0f;">Use the code below to reset your Vaulto Hub password.</p>
       <div style="margin: 24px 0; text-align: center;">
         <span style="display: inline-block; font-size: 32px; font-weight: 600; letter-spacing: 8px; color: #1a4fd6; padding: 16px 24px; background: #eaf2ff; border-radius: 16px;">${code}</span>
       </div>
@@ -88,7 +88,7 @@ export async function sendKycApprovedEmail({ to, firstName }: SendKycApprovedEma
   const html = `
     <div style="font-family: -apple-system, Segoe UI, sans-serif; max-width: 420px; margin: 0 auto;">
       <p style="font-size: 15px; color: #0b0b0f;">Hi ${escapeHtml(firstName)},</p>
-      <p style="font-size: 15px; color: #0b0b0f;">Good news — your identity verification has been approved. Your Astera Banking account now has full access.</p>
+      <p style="font-size: 15px; color: #0b0b0f;">Good news — your identity verification has been approved. Your Vaulto Hub account now has full access.</p>
       <div style="margin: 24px 0; text-align: center;">
         <span style="display: inline-block; font-size: 15px; font-weight: 600; color: #16a34a; padding: 14px 24px; background: #f0fdf4; border-radius: 16px;">Account verified ✓</span>
       </div>
@@ -121,7 +121,7 @@ export async function sendAccountSuspendedEmail({ to, firstName }: SendAccountSu
   const html = `
     <div style="font-family: -apple-system, Segoe UI, sans-serif; max-width: 420px; margin: 0 auto;">
       <p style="font-size: 15px; color: #0b0b0f;">Hi ${escapeHtml(firstName)},</p>
-      <p style="font-size: 15px; color: #0b0b0f;">Your Astera Banking account has been suspended and is currently under review. You won't be able to log in while this is in place.</p>
+      <p style="font-size: 15px; color: #0b0b0f;">Your Vaulto Hub account has been suspended and is currently under review. You won't be able to log in while this is in place.</p>
       <div style="margin: 24px 0; text-align: center;">
         <span style="display: inline-block; font-size: 15px; font-weight: 600; color: #dc2626; padding: 14px 24px; background: #fef2f2; border-radius: 16px;">Account suspended</span>
       </div>
@@ -154,7 +154,7 @@ export async function sendAccountReinstatedEmail({ to, firstName }: SendAccountR
   const html = `
     <div style="font-family: -apple-system, Segoe UI, sans-serif; max-width: 420px; margin: 0 auto;">
       <p style="font-size: 15px; color: #0b0b0f;">Hi ${escapeHtml(firstName)},</p>
-      <p style="font-size: 15px; color: #0b0b0f;">Good news — the suspension on your Astera Banking account has been lifted. You can now log in as usual.</p>
+      <p style="font-size: 15px; color: #0b0b0f;">Good news — the suspension on your Vaulto Hub account has been lifted. You can now log in as usual.</p>
       <div style="margin: 24px 0; text-align: center;">
         <span style="display: inline-block; font-size: 15px; font-weight: 600; color: #16a34a; padding: 14px 24px; background: #f0fdf4; border-radius: 16px;">Account reinstated</span>
       </div>
