@@ -1,0 +1,8 @@
+{
+  "accountType": "savings",
+  "personal": {"firstName": "Bank", "lastName": "Check", "dateOfBirth": "1990-03-03", "gender": "other", "nationality": "US"},
+  "contact": {"email": "bankcheck.user+claude@example.com", "phone": "+15555557777", "address": {"line1": "12 Bank Way", "city": "Testville", "state": "TS", "postalCode": "00011", "country": "US"}},
+  "kyc": {"idType": "passport", "idNumber": "BK7788996"},
+  "auth": {"loginId": "bankcheckuser01", "password": "TestPass123", "confirmPassword": "TestPass123"},
+  "consents": {"termsAccepted": true, "privacyPolicyAccepted": true, "electronicCommsConsent": true, "dataProcessingConsent": true, "amlDeclaration": true}
+}

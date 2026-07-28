@@ -4,6 +4,9 @@ export const NOTIFICATION_TYPES = [
   "crypto_deposit_accepted",
   "crypto_deposit_rejected",
   "crypto_deposit_credited",
+  "bank_deposit_initiated",
+  "bank_deposit_approved",
+  "bank_deposit_rejected",
 ] as const;
 
 export interface NotificationDocument extends Document {

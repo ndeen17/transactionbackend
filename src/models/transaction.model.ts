@@ -1,6 +1,6 @@
 import { Schema, model, type Document, type Types } from "mongoose";
 
-export const TRANSACTION_TYPES = ["transfer", "deposit", "adjustment", "crypto_deposit"] as const;
+export const TRANSACTION_TYPES = ["transfer", "deposit", "adjustment", "crypto_deposit", "bank_deposit"] as const;
 export const TRANSACTION_DIRECTIONS = ["debit", "credit"] as const;
 export const TRANSACTION_STATUSES = ["completed", "failed"] as const;
 
@@ -28,6 +28,12 @@ export interface TransactionDocument extends Document {
     address: string;
     txHash?: string;
   };
+  bankDeposit?: {
+    bankName: string;
+    accountName: string;
+    accountNumber: string;
+    routingNumber?: string;
+  };
   failureReason?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -53,6 +59,16 @@ const cryptoSchema = new Schema(
   { _id: false },
 );
 
+const bankDepositSchema = new Schema(
+  {
+    bankName: { type: String, required: true, trim: true },
+    accountName: { type: String, required: true, trim: true },
+    accountNumber: { type: String, required: true, trim: true },
+    routingNumber: { type: String, trim: true },
+  },
+  { _id: false },
+);
+
 const transactionSchema = new Schema<TransactionDocument>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
@@ -67,6 +83,7 @@ const transactionSchema = new Schema<TransactionDocument>(
     balanceAfterMinor: { type: Number, required: true },
     recipient: { type: recipientSchema },
     crypto: { type: cryptoSchema },
+    bankDeposit: { type: bankDepositSchema },
     failureReason: { type: String },
   },
   { timestamps: true },

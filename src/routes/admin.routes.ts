@@ -21,6 +21,18 @@ import {
   adminGetCryptoDeposits,
   adminRejectCryptoDeposit,
 } from "../controllers/adminCryptoDeposit.controller.js";
+import {
+  adminCreateBankAccount,
+  adminDeleteBankAccount,
+  adminGetBankAccounts,
+  adminUpdateBankAccount,
+} from "../controllers/adminBankAccount.controller.js";
+import {
+  adminAcceptBankDeposit,
+  adminGetBankDepositDetail,
+  adminGetBankDeposits,
+  adminRejectBankDeposit,
+} from "../controllers/adminBankDeposit.controller.js";
 import { requireAdmin } from "../middleware/requireAdmin.js";
 import { validateBody, validateQuery } from "../middleware/validate.js";
 import { adminLoginLimiter } from "../middleware/rateLimiters.js";
@@ -30,6 +42,8 @@ import {
   listCryptoDepositsQuerySchema,
   rejectCryptoDepositSchema,
 } from "../validators/cryptoDeposit.schema.js";
+import { createBankAccountSchema, updateBankAccountSchema } from "../validators/bankAccount.schema.js";
+import { listBankDepositsQuerySchema, rejectBankDepositSchema } from "../validators/bankDeposit.schema.js";
 
 export const adminRouter = Router();
 
@@ -70,4 +84,29 @@ adminRouter.post(
   requireAdmin,
   validateBody(rejectCryptoDepositSchema),
   adminRejectCryptoDeposit,
+);
+
+adminRouter.get("/bank-accounts", requireAdmin, adminGetBankAccounts);
+adminRouter.post("/bank-accounts", requireAdmin, validateBody(createBankAccountSchema), adminCreateBankAccount);
+adminRouter.patch(
+  "/bank-accounts/:id",
+  requireAdmin,
+  validateBody(updateBankAccountSchema),
+  adminUpdateBankAccount,
+);
+adminRouter.delete("/bank-accounts/:id", requireAdmin, adminDeleteBankAccount);
+
+adminRouter.get(
+  "/bank-deposits",
+  requireAdmin,
+  validateQuery(listBankDepositsQuerySchema),
+  adminGetBankDeposits,
+);
+adminRouter.get("/bank-deposits/:id", requireAdmin, adminGetBankDepositDetail);
+adminRouter.post("/bank-deposits/:id/accept", requireAdmin, adminAcceptBankDeposit);
+adminRouter.post(
+  "/bank-deposits/:id/reject",
+  requireAdmin,
+  validateBody(rejectBankDepositSchema),
+  adminRejectBankDeposit,
 );
