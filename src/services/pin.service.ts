@@ -1,8 +1,16 @@
 import bcrypt from "bcrypt";
 import { Types } from "mongoose";
 import { env } from "../config/env.js";
-import { User } from "../models/user.model.js";
+import { User, type UserDocument } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
+
+async function applyNewPin(user: UserDocument, pin: string) {
+  user.auth.pinHash = await bcrypt.hash(pin, env.BCRYPT_SALT_ROUNDS);
+  user.auth.pinSetAt = new Date();
+  user.auth.pinFailedAttempts = 0;
+  user.auth.pinLockedUntil = null;
+  await user.save();
+}
 
 export async function getPinStatus(userId: Types.ObjectId) {
   const user = await User.findById(userId).select("auth.pinSetAt");
@@ -29,11 +37,32 @@ export async function setupPin({ userId, pin, currentPassword }: SetupPinParams)
     throw new ApiError(401, "Incorrect password", "INVALID_PASSWORD");
   }
 
-  user.auth.pinHash = await bcrypt.hash(pin, env.BCRYPT_SALT_ROUNDS);
-  user.auth.pinSetAt = new Date();
-  user.auth.pinFailedAttempts = 0;
-  user.auth.pinLockedUntil = null;
-  await user.save();
+  await applyNewPin(user, pin);
+}
+
+interface ResetPinParams {
+  userId: Types.ObjectId;
+  pin: string;
+  currentPassword: string;
+}
+
+// For a user who already has a PIN but forgot it — same password-confirmation model as
+// setupPin, just without the "already set" guard, and it also clears any lockout from prior
+// failed attempts so a locked-out user can recover via their account password.
+export async function resetPin({ userId, pin, currentPassword }: ResetPinParams) {
+  const user = await User.findById(userId).select("+auth.passwordHash");
+  if (!user) throw new ApiError(404, "User not found", "NOT_FOUND");
+
+  if (!user.auth.pinSetAt) {
+    throw new ApiError(400, "No transaction PIN is set yet.", "PIN_NOT_SET");
+  }
+
+  const passwordMatches = await bcrypt.compare(currentPassword, user.auth.passwordHash);
+  if (!passwordMatches) {
+    throw new ApiError(401, "Incorrect password", "INVALID_PASSWORD");
+  }
+
+  await applyNewPin(user, pin);
 }
 
 interface VerifyPinParams {

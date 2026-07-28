@@ -14,6 +14,7 @@ export function toTransactionSummary(transaction: TransactionDocument) {
     balanceAfter: transaction.balanceAfterMinor / 100,
     recipient: transaction.recipient,
     crypto: transaction.crypto,
+    bankDeposit: transaction.bankDeposit,
     failureReason: transaction.failureReason,
     createdAt: transaction.createdAt,
   };
