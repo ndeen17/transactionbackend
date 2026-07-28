@@ -18,13 +18,12 @@ export const getCryptoAssets = asyncHandler(async (_req: AuthedRequest, res: Res
 });
 
 export const submitCryptoDepositHandler = asyncHandler(async (req: AuthedRequest, res: Response) => {
-  const { assetId, amountCrypto, amount, txHash, pin } = req.body as SubmitCryptoDepositInput;
+  const { assetId, amountCrypto, txHash, pin } = req.body as SubmitCryptoDepositInput;
 
   const request = await submitCryptoDeposit({
     userId: new Types.ObjectId(req.userId),
     assetId,
     amountCrypto,
-    amountMinor: amount,
     txHash: txHash || undefined,
     pin,
   });

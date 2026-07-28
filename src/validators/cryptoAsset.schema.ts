@@ -2,8 +2,7 @@ import { z } from "zod";
 
 export const createCryptoAssetSchema = z
   .object({
-    symbol: z.string().trim().min(1, "Required").max(10),
-    name: z.string().trim().min(1, "Required").max(80),
+    coingeckoId: z.string().trim().min(1, "Choose a crypto currency"),
     network: z.string().trim().max(40).optional().or(z.literal("")),
     address: z.string().trim().min(1, "Required").max(200),
   })
@@ -11,6 +10,11 @@ export const createCryptoAssetSchema = z
 
 export type CreateCryptoAssetInput = z.infer<typeof createCryptoAssetSchema>;
 
-export const updateCryptoAssetSchema = createCryptoAssetSchema;
+export const updateCryptoAssetSchema = z
+  .object({
+    network: z.string().trim().max(40).optional().or(z.literal("")),
+    address: z.string().trim().min(1, "Required").max(200),
+  })
+  .strict();
 
 export type UpdateCryptoAssetInput = z.infer<typeof updateCryptoAssetSchema>;

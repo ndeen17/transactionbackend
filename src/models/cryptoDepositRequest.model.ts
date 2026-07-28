@@ -13,6 +13,9 @@ export interface CryptoDepositRequestDocument extends Document {
   // balance math; only amountMinor (the self-reported USD-equivalent) is ever credited.
   amountCrypto: number;
   amountMinor: number;
+  // The live USD-per-unit price used to compute amountMinor at submission time — an audit
+  // record of what rate was used, not re-read by any later balance math.
+  priceUsdAtSubmission: number;
   currency: string;
   txHash?: string;
   reference: string;
@@ -37,6 +40,7 @@ const cryptoDepositRequestSchema = new Schema<CryptoDepositRequestDocument>(
     address: { type: String, required: true, trim: true },
     amountCrypto: { type: Number, required: true, min: 0 },
     amountMinor: { type: Number, required: true, min: 1 },
+    priceUsdAtSubmission: { type: Number, required: true, min: 0 },
     currency: { type: String, required: true, default: "USD", maxlength: 3 },
     txHash: { type: String, trim: true, maxlength: 200 },
     reference: { type: String, required: true, trim: true },

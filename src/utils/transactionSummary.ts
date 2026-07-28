@@ -13,6 +13,7 @@ export function toTransactionSummary(transaction: TransactionDocument) {
     narration: transaction.narration,
     balanceAfter: transaction.balanceAfterMinor / 100,
     recipient: transaction.recipient,
+    crypto: transaction.crypto,
     failureReason: transaction.failureReason,
     createdAt: transaction.createdAt,
   };

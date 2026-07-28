@@ -9,6 +9,7 @@ export function toCryptoDepositSummary(request: CryptoDepositRequestDocument) {
     address: request.address,
     amountCrypto: request.amountCrypto,
     amount: request.amountMinor / 100,
+    priceUsdAtSubmission: request.priceUsdAtSubmission,
     currency: request.currency,
     txHash: request.txHash,
     reference: request.reference,

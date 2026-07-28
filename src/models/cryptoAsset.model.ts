@@ -2,6 +2,7 @@ import { Schema, model, type Document, type Types } from "mongoose";
 
 export interface CryptoAssetDocument extends Document {
   _id: Types.ObjectId;
+  coingeckoId: string;
   symbol: string;
   name: string;
   network?: string;
@@ -12,6 +13,7 @@ export interface CryptoAssetDocument extends Document {
 
 const cryptoAssetSchema = new Schema<CryptoAssetDocument>(
   {
+    coingeckoId: { type: String, required: true, trim: true },
     symbol: { type: String, required: true, trim: true, uppercase: true, maxlength: 10 },
     name: { type: String, required: true, trim: true, maxlength: 80 },
     network: { type: String, trim: true, maxlength: 40 },

@@ -12,6 +12,7 @@ import {
   adminCreateCryptoAsset,
   adminDeleteCryptoAsset,
   adminGetCryptoAssets,
+  adminGetCryptoCatalog,
   adminUpdateCryptoAsset,
 } from "../controllers/adminCryptoAsset.controller.js";
 import {
@@ -45,6 +46,7 @@ adminRouter.post(
   submitBalanceAdjustment,
 );
 
+adminRouter.get("/crypto-catalog", requireAdmin, adminGetCryptoCatalog);
 adminRouter.get("/crypto-assets", requireAdmin, adminGetCryptoAssets);
 adminRouter.post("/crypto-assets", requireAdmin, validateBody(createCryptoAssetSchema), adminCreateCryptoAsset);
 adminRouter.patch(

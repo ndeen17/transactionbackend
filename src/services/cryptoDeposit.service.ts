@@ -8,6 +8,7 @@ import {
 import { generateUniqueReference } from "./transactionReference.service.js";
 import { verifyPin } from "./pin.service.js";
 import { createNotification } from "./notification.service.js";
+import { getPriceUsd } from "./cryptoCatalog.service.js";
 import { ApiError } from "../utils/ApiError.js";
 
 export const CRYPTO_DEPOSIT_CREDIT_DELAY_MS = 60_000;
@@ -16,7 +17,6 @@ interface SubmitCryptoDepositParams {
   userId: Types.ObjectId;
   assetId: string;
   amountCrypto: number;
-  amountMinor: number;
   txHash?: string;
   pin: string;
 }
@@ -25,7 +25,6 @@ export async function submitCryptoDeposit({
   userId,
   assetId,
   amountCrypto,
-  amountMinor,
   txHash,
   pin,
 }: SubmitCryptoDepositParams) {
@@ -40,6 +39,11 @@ export async function submitCryptoDeposit({
 
   await verifyPin({ userId, pin });
 
+  // Fetched only after PIN verification, so an unauthenticated attempt never triggers an
+  // outbound API call. Fails closed — no request is created if a live price can't be had.
+  const priceUsd = await getPriceUsd(asset.coingeckoId);
+  const amountMinor = Math.round(amountCrypto * priceUsd * 100);
+
   const reference = await generateUniqueReference();
 
   const request = await CryptoDepositRequest.create({
@@ -50,6 +54,7 @@ export async function submitCryptoDeposit({
     address: asset.address,
     amountCrypto,
     amountMinor,
+    priceUsdAtSubmission: priceUsd,
     currency: "USD",
     txHash: txHash || undefined,
     reference,

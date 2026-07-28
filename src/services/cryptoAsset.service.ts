@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
 import { CryptoAsset } from "../models/cryptoAsset.model.js";
+import { getCatalog } from "./cryptoCatalog.service.js";
 import { ApiError } from "../utils/ApiError.js";
 import type { CreateCryptoAssetInput, UpdateCryptoAssetInput } from "../validators/cryptoAsset.schema.js";
 
@@ -8,9 +9,16 @@ export async function listCryptoAssets() {
 }
 
 export async function createCryptoAsset(input: CreateCryptoAssetInput) {
+  const catalog = await getCatalog();
+  const coin = catalog.find((c) => c.coingeckoId === input.coingeckoId);
+  if (!coin) {
+    throw new ApiError(400, "Choose a valid crypto asset", "INVALID_ASSET");
+  }
+
   return CryptoAsset.create({
-    symbol: input.symbol,
-    name: input.name,
+    coingeckoId: coin.coingeckoId,
+    symbol: coin.symbol,
+    name: coin.name,
     network: input.network || undefined,
     address: input.address,
   });
@@ -25,8 +33,6 @@ export async function updateCryptoAsset(id: string, input: UpdateCryptoAssetInpu
     id,
     {
       $set: {
-        symbol: input.symbol,
-        name: input.name,
         network: input.network || undefined,
         address: input.address,
       },

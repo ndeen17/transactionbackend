@@ -1,12 +1,5 @@
 import { z } from "zod";
 
-const amountToMinorUnits = z
-  .number()
-  .positive("Enter an amount greater than 0")
-  .max(1_000_000, "Amount is too large")
-  .refine((v) => Number.isInteger(Math.round(v * 100)), "Amount can have at most 2 decimal places")
-  .transform((v) => Math.round(v * 100));
-
 const pinField = z.string().trim().regex(/^[0-9]{4,6}$/, "Enter your PIN");
 
 const objectIdField = z.string().trim().regex(/^[0-9a-fA-F]{24}$/, "Choose a crypto asset");
@@ -14,9 +7,8 @@ const objectIdField = z.string().trim().regex(/^[0-9a-fA-F]{24}$/, "Choose a cry
 export const submitCryptoDepositSchema = z
   .object({
     assetId: objectIdField,
-    // Display-only, not minor units — crypto amounts need more than 2 decimal places.
+    // The USD-equivalent is computed server-side from a live price, not taken from the client.
     amountCrypto: z.number().positive("Enter the amount you sent").max(1_000_000, "Amount is too large"),
-    amount: amountToMinorUnits,
     txHash: z.string().trim().max(200).optional().or(z.literal("")),
     pin: pinField,
   })
